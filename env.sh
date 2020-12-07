@@ -1,23 +1,26 @@
 #!/bin/bash
 
-# certificate needed, brokers certificate should be based on hostname of the cerificate
-declare -a MACHINES=("ip-172-30-5-139.us-west-2.compute.internal" "ip-172-30-5-158.us-west-2.compute.internal" "ip-172-30-5-136.us-west-2.compute.internal" "ip-172-30-5-62.us-west-2.compute.internal" "ip-172-30-5-48.us-west-2.compute.internal" "ip-172-30-5-133.us-west-2.compute.internal" "ip-172-30-5-153.us-west-2.compute.internal" "ip-172-30-5-57.us-west-2.compute.internal")
-declare -a PUBLIC_DNS=("ec2-54-214-201-20.us-west-2.compute.amazonaws.com" "ec2-34-221-24-175.us-west-2.compute.amazonaws.com" "ec2-34-222-12-54.us-west-2.compute.amazonaws.com" "" "" "ec2-18-236-200-240.us-west-2.compute.amazonaws.com" "ec2-34-220-82-234.us-west-2.compute.amazonaws.com" "")
+# set the env (CA) and region (intermediate CA) domains
+CA_DOMAIN="dev.stream.idscloud.io"
+INT_DOMAIN="ap-southeast-2.${CA_DOMAIN}"
+PRIVATE_DOMAIN="ap-southeast-2.compute.internal"
 
+# certificate needed, brokers certificate should be based on hostname of the cerificate
+declare -a MACHINES=("ip-10-150-1-51.${PRIVATE_DOMAIN}" "ip-10-150-1-48.${PRIVATE_DOMAIN}" "ip-10-150-1-54.${PRIVATE_DOMAIN}" "ip-10-150-1-58.${PRIVATE_DOMAIN}" "ip-10-150-1-36.${PRIVATE_DOMAIN}" "broker-0.${INT_DOMAIN}" "broker-1.${INT_DOMAIN}" "broker-2.${INT_DOMAIN}" "broker-3.${INT_DOMAIN}" "broker-4.${INT_DOMAIN}" "schema-0.${INT_DOMAIN}" "schema-1.${INT_DOMAIN}" "ip-10-150-2-40.${PRIVATE_DOMAIN}" "ip-10-150-2-44.${PRIVATE_DOMAIN}" "ip-10-150-2-48.${PRIVATE_DOMAIN}" "ip-10-150-1-56.${PRIVATE_DOMAIN}")
+declare -a PUBLIC_DNS=("" "" "" "" "" "kafka.${INT_DOMAIN}" "kafka.${INT_DOMAIN}" "kafka.${INT_DOMAIN}" "kafka.${INT_DOMAIN}" "kafka.${INT_DOMAIN}" "kafka.${INT_DOMAIN}" "kafka.${INT_DOMAIN}" "" "" "" "")
 
 # location to create certificates
 CERTS=certs
 
 # the password of the root authority certificate
-CA_PASSWORD=password
+CA_PASSWORD=D@t@MartD3v!
 
 # the password if the intermediate certificate
-INTERMEDIATE_PASSWORD=password
+INTERMEDIATE_PASSWORD=D@t@MartD3v!
 
 # the password of the broker certificate and the keystore
 # keystore password and key password must be the same
-BROKER_PASSWORD=password
-
+BROKER_PASSWORD=YuI6#hsCcQb550z!
 
 ## Make the CERTS directory and ensure that it wasn't removed above
 
@@ -26,4 +29,3 @@ if [ "${CERTS}" == "" ]; then
   exit
 fi
 mkdir -p ${CERTS}
-

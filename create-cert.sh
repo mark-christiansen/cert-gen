@@ -21,8 +21,6 @@ CA_PW=${CA_PASSWORD}
 IN_PW=${INTERMEDIATE_PASSWORD}
 B_PW=${BROKER_PASSWORD}
 
-DOMAIN=idsgrp.com
-
 #
 # Subject should be adjusted for your location, with the CN record being the hostname.
 #
@@ -30,11 +28,10 @@ COUNTRY=US
 STATE=MN
 CITY=MINNEAPOLIS
 ORG=IDS
-UNIT=KAFKA
+UNIT=IT
 i=${HOSTNAME}
 
-#SUBJECT="/C=${COUNTRY}/ST=${STATE}/L=${CITY}/O=${ORG}/OU=${UNIT}/CN=${i}"
-SUBJECT="/CN=${i}"
+SUBJECT="/C=${COUNTRY}/ST=${STATE}/L=${CITY}/O=${ORG}/OU=${UNIT}/CN=${i}"
 
 key=${i}.key
 req=${i}.req
@@ -64,7 +61,7 @@ echo "Subject Alt Name=${SUBJECT_ALT}"
 printf "\n\ngenerate csr\n==========\n\n"
 openssl req -new -sha256 -key ${CERTS}/${key} -passin pass:${B_PW} -out ${CERTS}/${req} -subj "${SUBJECT}" \
 	-reqexts SAN \
-	-config <(cat ./openssl.cnf <(printf "\n[SAN]\nsubjectAltName=DNS:${i}\nextendedKeyUsage=serverAuth,clientAuth"))
+	-config <(cat ./openssl.cnf <(printf "\n[SAN]\nsubjectAltName=${SUBJECT_ALT}\nextendedKeyUsage=serverAuth,clientAuth"))
 [ $? -eq 1 ] && echo "unable to generate csr for ${i}." && exit
 
 printf "\n[v3_ca]\nsubjectAltName=${SUBJECT_ALT}\nextendedKeyUsage=serverAuth,clientAuth" > ${CERTS}/${cnf}
@@ -91,13 +88,14 @@ openssl x509 \
 	-passin pass:$IN_PW \
 	-in ${CERTS}/${req} \
 	-out ${CERTS}/${crt} \
-	-days 365 \
+	-days 1095 \
 	-CAcreateserial \
-        -extfile ${CERTS}/${cnf} \
+    -extfile ${CERTS}/${cnf} \
 	-extensions v3_ca 
 [ $? -eq 1 ] && echo "unable to sign the csr for ${i}." && exit
 
 cat ${CERTS}/intermediate.crt ${CERTS}/ca.crt > ${CERTS}/chain.pem
+cp ${CERTS}/chain.pem ${CERTS}/${i}_chain.pem
 
 openssl verify -CAfile ${CERTS}/chain.pem ${CERTS}/${crt}
 [ $? -eq 1 ] && echo "unable to verify certificate for ${i}." && exit

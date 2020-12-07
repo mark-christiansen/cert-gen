@@ -14,3 +14,6 @@ cd ${BASE}
 
 ./create-keystore.sh
 [ $? -eq 1 ] && echo "unable to create keystores" && exit
+
+./rename-files.sh
+[ $? -eq 1 ] && echo "unable to rename files" && exit
