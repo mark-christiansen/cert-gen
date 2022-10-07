@@ -59,7 +59,7 @@ fi
 echo "Subject Alt Name=${SUBJECT_ALT}"
 
 printf "\n\ngenerate csr\n==========\n\n"
-openssl req -new -sha256 -key ${CERTS}/${key} -passin pass:${B_PW} -out ${CERTS}/${req} -subj "${SUBJECT}" \
+openssl req -new -sha384 -key ${CERTS}/${key} -passin pass:${B_PW} -out ${CERTS}/${req} -subj "${SUBJECT}" \
 	-reqexts SAN \
 	-config <(cat ./openssl.cnf <(printf "\n[SAN]\nsubjectAltName=${SUBJECT_ALT}\nextendedKeyUsage=serverAuth,clientAuth"))
 [ $? -eq 1 ] && echo "unable to generate csr for ${i}." && exit
@@ -83,6 +83,7 @@ printf "\n\nsign csr\n========\n\n"
   #
 openssl x509 \
 	-req \
+	-sha384 \
 	-CA ${CERTS}/intermediate.crt \
 	-CAkey ${CERTS}/intermediate.key \
 	-passin pass:$IN_PW \
@@ -90,7 +91,7 @@ openssl x509 \
 	-out ${CERTS}/${crt} \
 	-days 1095 \
 	-CAcreateserial \
-    -extfile ${CERTS}/${cnf} \
+        -extfile ${CERTS}/${cnf} \
 	-extensions v3_ca 
 [ $? -eq 1 ] && echo "unable to sign the csr for ${i}." && exit
 
