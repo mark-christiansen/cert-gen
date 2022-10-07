@@ -33,7 +33,7 @@ echo "======================="
 echo ""
 
 printf "\n\ncreated CA key and CA csr\n=========================\n\n"
-openssl req -newkey rsa:1024 -sha1 -passout pass:${ca_password} -keyout ${CERTS}/${key} -out ${CERTS}/${req} -subj ${subject} \
+openssl req -newkey rsa:3072 -sha384 -passout pass:${ca_password} -keyout ${CERTS}/${key} -out ${CERTS}/${req} -subj ${subject} \
 	-reqexts ext \
 	-config <(cat ./openssl.cnf <(printf "\n[ext]\nbasicConstraints=CA:TRUE,pathlen:5"))
 [ $? -eq 1 ] && echo "unable to create CA key and csr" && exit
@@ -47,7 +47,7 @@ openssl req -text -noout -verify -in ${CERTS}/${req}
 [ $? -eq 1 ] && echo "unable to verify CA csr" && exit
 
 printf "\n\nself-sign CA csr\n================\n\n"
-openssl x509 -req -in ${CERTS}/${req} -sha1 -days 3650 -passin pass:${ca_password} -signkey ${CERTS}/${key} -out ${CERTS}/${crt} \
+openssl x509 -req -in ${CERTS}/${req} -sha384 -days 3650 -passin pass:${ca_password} -signkey ${CERTS}/${key} -out ${CERTS}/${crt} \
 	-extensions ext \
 	-extfile <(cat ./openssl.cnf <(printf "\n[ext]\nbasicConstraints=CA:TRUE,pathlen:5"))
 [ $? -eq 1 ] && echo "unable to self-sign CA csr" && exit
